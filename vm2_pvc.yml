@@ -1,0 +1,55 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  creationTimestamp: null
+  name: vm2
+  namespace: vmi
+spec:
+  dataVolumeTemplates:
+  - metadata:
+      creationTimestamp: null
+      name: vm2-pvc-ubuntu2204
+    spec:
+      source:
+        pvc:
+          name: ubuntu2204
+          namespace: vmi
+      storage:
+        resources: {}
+  preference:
+    inferFromVolume: vm2-pvc-ubuntu2204
+    inferFromVolumeFailurePolicy: Ignore
+  runStrategy: Always
+  template:
+    metadata:
+      creationTimestamp: null
+    spec:
+      domain:
+        devices: 
+          - disk:
+              bus: virtio
+            name: vm1-pvc-ubuntu2204
+        memory:
+          guest: 1Gi
+        resources: {}
+      terminationGracePeriodSeconds: 180
+      volumes:
+      - dataVolume:
+          name: vm2-pvc-ubuntu2204
+        name: vm2-pvc-ubuntu2204
+      - name: vm2-cloudinitdisk
+        cloudInitNoCloud:
+          userData: |
+            #cloud-config
+            users:
+              - default
+              - name: ubuntu
+                plain_text_passwd: ubuntu
+                gecos: Ubuntu
+                lock_passwd: false
+                groups: [adm, audio, cdrom, dialout, dip, floppy, lxd, netdev, plugdev, sudo, video]
+                sudo: ["ALL=(ALL) NOPASSWD:ALL"]
+                shell: /bin/bash
+                ssh_authorized_keys:
+                - ssh-ed25519 AAAAYoursshkeyhere
+status: {}

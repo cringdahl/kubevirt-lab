@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: test-claim
+spec:
+  accessModes:
+    - ReadWriteMany
+  # volumeMode: Block # default is Filesystem
+  resources:
+    requests:
+      storage: 3Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pod-1
+spec:
+  volumes:
+    - name: test-storage
+      persistentVolumeClaim:
+        claimName: test-claim
+  containers:
+    - name: test-container
+      image: nginx
+      ports:
+        - containerPort: 80
+          name: "http-server"
+      volumeMounts:
+        - mountPath: "/mnt"
+          name: test-storage
+      # volumeDevices: # for Block volumes
+      # - devicePath: "/usr/share/nginx/html"          
+      #   name: test-storage
+---
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pod-2 # second pod will show RWX working
+spec:
+  volumes:
+    - name: test-storage
+      persistentVolumeClaim:
+        claimName: test-claim
+  containers:
+    - name: test-container
+      image: nginx
+      ports:
+        - containerPort: 80
+          name: "http-server"
+      volumeMounts:
+        - mountPath: "/mnt"
+          name: test-storage
+      # volumeDevices: # for Block volumes
+      # - devicePath: "/usr/share/nginx/html"          
+      #   name: test-storage

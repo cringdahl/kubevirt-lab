@@ -1,0 +1,5 @@
+# this is the target namespace for vm images
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: vmi

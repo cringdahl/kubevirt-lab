@@ -1,0 +1,11 @@
+# there is no default storageprofile for longhorn in kubevirt
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: StorageProfile
+metadata: 
+  name: longhorn
+spec:
+  claimPropertySets: 
+  - accessModes:
+    - ReadWriteMany # this is nfs based!
+    volumeMode: Filesystem # Block # block unusable from longhorn in lab environment; worth trying again in clean env
+  cloneStrategy: csi-clone
